@@ -19,10 +19,11 @@
                 <!-- .trade__label -->
                 <label for="" class="trade__label">
                     {if $side == 1}
-                      {msg desc="I want to buy"}I want to buy {$crypto_currency_symbol}{/msg}
+                      {msg desc="I want to buy"}I want to buy{/msg}
                     {else}
                       {msg desc="I want to sell"}I want to sell{/msg}
                     {/if}
+                    <span class="add-on simple-order-entry-price-sign">{$crypto_currency_symbol}</span>
                 </label>
                 <!-- /.trade__label -->
 
@@ -31,7 +32,9 @@
                        data-uniform-label="{msg desc="I want to sell"}Quantity{/msg}"
                        class="input input--full"
                        data-uniform-validators="validateNumber; required"
-                       type="text" required/>
+                       data-uniform-type="number"
+                       data-uniform-filters="positive_number"
+                      type="text" required/>
             </div>
             <!-- /.layout__item -->
 
@@ -39,7 +42,8 @@
             <div class="layout__item palm--one-whole four-tenths">
                 <!-- .trade__label -->
                 <label for="" class="trade__label">
-                    {msg desc="for a total of"} for a total of {$currency_symbol}{/msg}
+                    {msg desc="for a total of"} for a total of {/msg}
+                    <span class="add-on simple-order-entry-price-sign">{$currency_symbol}</span>
                 </label>
                 <!-- /.trade__label -->
 
@@ -48,6 +52,8 @@
                        data-uniform-label="{msg desc="I want to sell"}Total{/msg}"
                        class="input input--full"
                        data-uniform-validators="validateNumber; required"
+                       data-uniform-type="number"
+                       data-uniform-filters="positive_number"
                        type="text" required/>
             </div>
             <!-- /.layout__item -->

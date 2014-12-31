@@ -6,6 +6,7 @@ goog.require('bitex.view.View.EventType');
 
 goog.require('bitex.ui.AdvancedOrderEntry');
 
+goog.require('bitex.ui.LockedBalanceDisplay');
 
 /**
  * @param {*} app
@@ -18,6 +19,7 @@ bitex.view.OfferBookView = function(app, opt_domHelper) {
 
   this.order_book_bid_ = null;
   this.order_book_offer_ = null;
+  this.locked_balance_display_ = null;
 
   this.market_data_subscription_id_ = null;
   this.market_data_subscription_symbol_ = null;
@@ -37,6 +39,11 @@ bitex.view.OfferBookView.prototype.order_book_bid_;
  * @type {bitex.ui.OrderBook}
  */
 bitex.view.OfferBookView.prototype.order_book_offer_;
+
+/**
+ * @type {bitex.ui.LockedBalanceDisplay}
+ */
+bitex.view.OfferBookView.prototype.locked_balance_display_;
 
 /**
  * @type {number}
@@ -99,13 +106,16 @@ bitex.view.OfferBookView.prototype.decorateInternal = function(element) {
 
   this.buy_order_entry_ = new bitex.ui.AdvancedOrderEntry( {side: 1, type:2} );
   this.sell_order_entry_ = new bitex.ui.AdvancedOrderEntry( {side: 2, type:2} );
+  this.locked_balance_display_ = new bitex.ui.LockedBalanceDisplay();
 
   this.getContentElement = function() {
     return goog.dom.getElement('offer_book_order_entry_content');
   };
 
+
   this.addChild(this.buy_order_entry_, true);
   this.addChild(this.sell_order_entry_, true);
+  this.addChild(this.locked_balance_display_, true);
 };
 
 /**
@@ -208,9 +218,16 @@ bitex.view.OfferBookView.prototype.onSelectedBrokerID_ = function(e){
   var selected_symbol = model.get('SelectedSymbol');
   selected_symbol = goog.isDefAndNotNull(selected_symbol) ? selected_symbol.symbol : null;
 
+  if (!goog.isDefAndNotNull(model.get('UserBrokers'))) {
+    return;
+  }
+
   var selectedBroker = model.get('UserBrokers')[ selected_broker_id ];
   this.buy_order_entry_.setBrokerID(selected_broker_id);
   this.sell_order_entry_.setBrokerID(selected_broker_id);
+  this.locked_balance_display_.setAccountID(model.get('UserID'));
+  this.locked_balance_display_.setBrokerID(selected_broker_id);
+
 
   var market = selectedBroker['AllowedMarkets'][selected_symbol];
   goog.style.showElement( this.sell_order_entry_.getElement(), goog.isDefAndNotNull( market));
@@ -223,6 +240,8 @@ bitex.view.OfferBookView.prototype.onSelectedBrokerID_ = function(e){
     this.buy_order_entry_.setBrokerMode(false);
     this.sell_order_entry_.setBrokerMode(false);
   }
+
+  model.updateDom();
 };
 
 /**
@@ -233,6 +252,11 @@ bitex.view.OfferBookView.prototype.onSelectedSymbol_ = function(e){
   var model = this.getApplication().getModel();
   var selected_symbol = model.get('SelectedSymbol');
   var selected_broker_id = model.get('SelectedBrokerID');
+
+  if (!goog.isDefAndNotNull(model.get('UserBrokers'))) {
+    return;
+  }
+
   var selectedBroker = model.get('UserBrokers')[ selected_broker_id ];
   var symbol = selected_symbol.symbol;
 
@@ -251,6 +275,11 @@ bitex.view.OfferBookView.prototype.onSelectedSymbol_ = function(e){
   if (goog.isDefAndNotNull(selected_symbol.price_currency)) {
     this.sell_order_entry_.setPriceCurrencySign( selected_symbol.price_currency.sign );
   }
+
+  this.locked_balance_display_.setBuyCurrency(selected_symbol.price_currency.code);
+  this.locked_balance_display_.setSellCurrency(selected_symbol.qty_currency.code);
+  this.locked_balance_display_.setBrokerID(selected_broker_id);
+  this.locked_balance_display_.setAccountID(model.get('UserID'));
 
   this.buy_order_entry_.setBrokerID(selected_broker_id);
   this.sell_order_entry_.setBrokerID(selected_broker_id);
@@ -271,6 +300,7 @@ bitex.view.OfferBookView.prototype.onSelectedSymbol_ = function(e){
     this.sell_order_entry_.setBrokerMode(false);
   }
 
+  model.updateDom();
   this.recreateOrderBookComponents_(selected_symbol);
 };
 

@@ -1,6 +1,51 @@
 {namespace bitex.templates}
 
 /**
+  */
+{template .ProfileViewChangePasswordPlaceHolder}
+  <div class="span6 well"></div>
+{/template}
+
+/**
+  * @param permissions
+  */
+{template .AlgoPermissionsDialogContent}
+  <p class="lead"> {msg desc="Algorithm trading request permmissions dialog content"}This algorithm is requesting your permission to:{/msg}</p>
+
+  <ul class="list-unstyled" style="line-height: 2">
+  {foreach $permission in  $permissions }
+    <li><span class="fa fa-check text-success"></span>
+    {switch $permission}
+      {case 'notification'}
+        {msg desc="Permission in Algo Permissions Dialog"} Show notifications{/msg}
+      {case 'balance'}
+        {msg desc="Permission in Algo Permissions Dialog"} See your balances{/msg}
+      {case 'execution_report'}
+        {msg desc="Permission in Algo Permissions Dialog"} Listen to the execution reports from your orders{/msg}
+      {case 'new_order_limited'}
+        {msg desc="Permission in Algo Permissions Dialog"} Send limited orders{/msg}
+      {case 'new_buy_order_limited'}
+        {msg desc="Permission in Algo Permissions Dialog"} Send buy limited orders{/msg}
+      {case 'new_sell_order_limited'}
+        {msg desc="Permission in Algo Permissions Dialog"} Send sell limited orders{/msg}
+      {case 'new_market_order'}
+        {msg desc="Permission in Algo Permissions Dialog"} Send market orders{/msg}
+      {case 'new_buy_market_order'}
+        {msg desc="Permission in Algo Permissions Dialog"} Send buy market orders{/msg}
+      {case 'new_sell_market_order'}
+        {msg desc="Permission in Algo Permissions Dialog"} Send sell market order{/msg}
+      {case 'cancel_order'}
+        {msg desc="Permission in Algo Permissions Dialog"} Cancel orders{/msg}
+      {default}
+        {$permission}
+    {/switch}
+    </li>
+  {/foreach}
+  </ul>
+{/template}
+
+
+/**
   * @param msg_customer_detail
   */
 {template .CustomerDetailDialog}
@@ -545,14 +590,21 @@
 /**
   * @param deposit_message
   * @param hasInstantDepositsEnabled
+  * @param? amount
+  * @param? formattedAmount
   */
 {template .DepositCryptoCurrencyContentDialog}
   <div class="row-fluid" data-deposit-status="prepare">
     <h4 class="text-center">
       {$deposit_message['Data']['InputAddress'] }
     </h4>
+    {if $formattedAmount}
     <div class="text-center">
-      <img src="https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl={$deposit_message['Data']['InputAddress'] }"/>
+      {msg desc="deposit the amount"} Deposit the exact amount of :{/msg} {$formattedAmount}
+    </div>
+    {/if}
+    <div class="text-center">
+      <img src="https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=bitcoin%3A{$deposit_message['Data']['InputAddress']}{if $amount}%3Famount%3D{$amount}{/if}"/>
     </div>
     {if $hasInstantDepositsEnabled}
       <div class="alert alert-block">
@@ -747,6 +799,7 @@
   * @param showFeeDataEntry
   * @param amountID
   * @param? amount
+  * @param? formattedAmount
   * @param percentFeeID
   * @param fixedFeeID
   * @param totalFeesID
@@ -801,9 +854,7 @@
             {/msg}
           </div>
           {if $verificationLevel == 0}
-            {msg desc="get verified message"}
-              You can verify your account by clicking in <a href="" data-switch-view="verification">Verify your account</a>
-            {/msg}
+            <a href="" data-switch-view="verification">{msg desc="get verified message"} Verify your account {/msg}</a>
           {/if}
         {else}
           <div class="alert alert-danger text-center">
@@ -820,19 +871,22 @@
                     <label class="modal-form__label">{msg desc="amount"}Amount{/msg} {$currencySign}:</label>
                     <input id="{$method['method']}_{$amountID}"
                     data-uniform-validators="required; validateNumber {if $method['limits'][$verificationLevel]['enabled']} {if $method['limits'][$verificationLevel]['min']}; validateMin {$method['limits'][$verificationLevel]['formatted_min_value'] }{/if}{if $method['limits'][$verificationLevel]['max']}; validateMax {$method['limits'][$verificationLevel]['formatted_max_value'] } {/if} {/if}"
+                    data-uniform-type="number"
+                    data-uniform-filters="positive_number"
                     type="text"
                     class="withdraw-field input input--full"
                     size="16"
+                    value="{if $formattedAmount}{$formattedAmount}{/if}"
                     name="Amount">
 
                     {if $method['limits'][$verificationLevel]['enabled']}
                         <small>
-                            {if $method['limits'][$verificationLevel]['min']}
-                                {msg desc="amount help block"} Maximum: {$method['limits'][$verificationLevel]['formatted_max'] } per day.  {/msg}
+                            {if $method['limits'][$verificationLevel]['max']}
+                                {msg desc="amount help block"} Available: {$method['limits'][$verificationLevel]['formatted_max'] }{/msg}
                                 <br>
                             {/if}
 
-                            {if $method['limits'][$verificationLevel]['max']}
+                            {if $method['limits'][$verificationLevel]['min']}
                                 {msg desc="amount help block"} Minimum: {$method['limits'][$verificationLevel]['formatted_min'] } per transaction.  {/msg}
                             {/if}
                         </small>
@@ -890,6 +944,9 @@
 
                     <input id="{$method['method']}_{$amountID}"
                         data-uniform-validators="required; validateNumber {if $method['limits'][$verificationLevel]['enabled']} {if $method['limits'][$verificationLevel]['min']}; validateMin {$method['limits'][$verificationLevel]['formatted_min_value'] }{/if}{if $method['limits'][$verificationLevel]['max']}; validateMax {$method['limits'][$verificationLevel]['formatted_max_value'] } {/if} {/if}"
+                        data-uniform-type="number"
+                        data-uniform-filters="positive_number"
+                        value="{if $formattedAmount}{$formattedAmount}{/if}"
                         type="text"
                         class="withdraw-field input input--full"
                         size="16"
@@ -897,12 +954,12 @@
 
                     {if $method['limits'][$verificationLevel]['enabled']}
                         <small>
-                            {if $method['limits'][$verificationLevel]['min']}
-                                {msg desc="amount help block"} Maximum: {$method['limits'][$verificationLevel]['formatted_max'] } per day.  {/msg}
+                            {if $method['limits'][$verificationLevel]['max']}
+                                {msg desc="amount help block"} Available: {$method['limits'][$verificationLevel]['formatted_max'] }{/msg}
                                 <br>
                             {/if}
 
-                            {if $method['limits'][$verificationLevel]['max']}
+                            {if $method['limits'][$verificationLevel]['min']}
                                 {msg desc="amount help block"} Minimum: {$method['limits'][$verificationLevel]['formatted_min'] } per transaction.  {/msg}
                             {/if}
                         </small>

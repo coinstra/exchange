@@ -17,6 +17,10 @@ load_application:       True
             {% t exchanges.chilebit.lead  %}
           {% when 'surbitcoin' %}
             {% t exchanges.surbitcoin.lead  %}
+          {% when 'urdubit' %}
+            {% t exchanges.urdubit.lead  %}
+          {% when 'foxbit' %}
+            {% t exchanges.foxbit.lead  %}
           {% else %}
             {% t exchanges.demo.lead  %}
           {% endcase %}
@@ -247,23 +251,39 @@ load_application:       True
     </div>
   </div>
 
+  <div class="alert | bitex-model" style="display: none" data-model-key="IsMissingVerification" data-model-action="show_element">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <a href="" data-switch-view="verification"> {% t views.alerts.verification %} </a>
+  </div>
+
+  <div class="alert alert-success | bitex-model" style="display: none" data-model-key="TwoFactorEnabled" data-model-action="hide_element">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <a href="" data-switch-view="profile"> {% t views.alerts.enable_two_factor %} </a>
+  </div>
+
+  <div class="alert alert-error | bitex-model" style="display: none" data-model-key="IsAccountBlocked" data-model-action="show_element">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <a href="" data-switch-view="faq"> {% t views.alerts.frozen_account %} </a>
+  </div>
+
+
   <div class="page row-fluid bitex-display-if-logged">
     <div class="span9">
       <div id="profile" class="bitex-view">
         <div class="section-title">
           <h3 class="bitex-view-title">{% t views.profile.title %}</h3>
         </div>
-        <div id="profile_content" class="bitex-view-content">
+        <div id="profile_content" class="">
           <div id="account_overview_user_id"></div>
-        </div>
-
-        <div class="section-title">
-          <h3 class="bitex-view-title">{% t views.profile.two_factor_auth_section.title %}</h3>
         </div>
 
         <div class="content bitex-view-content">
 
           <div class="well span6">
+            <div class="section-title">
+              <h3 class="bitex-view-title">{% t views.profile.two_factor_auth_section.title %}</h3>
+            </div>
+
             <div id="id_enable_two_factor_div" class="form-horizontal ">
 
               <div class="control-group">
@@ -295,6 +315,7 @@ load_application:       True
             <button id="id_btn_enable_two_factor" class="btn btn-primary">{% t views.profile.two_factor_auth_section.enable %}</button>
             <button id="id_btn_disable_two_factor" class="btn btn-danger">{% t views.profile.two_factor_auth_section.disable %}</button>
           </div>
+
         </div>
       </div>
 
@@ -307,6 +328,14 @@ load_application:       True
           <div id="id_trading_well"></div>
         </div>
       </div>
+
+      <div id="algotrading" class="bitex-view">
+        <div class="section-title">
+          <h3 class="bitex-view-title">{% t views.algotrading.title %}</h3>
+        </div>
+        <div class="bitex-view-content"></div>
+      </div>
+
 
       <div id="offerbook" class="bitex-view">
         <div class="section-title">
@@ -407,6 +436,9 @@ load_application:       True
         </div>
       </div>
 
+
+
+
       <div id="settings" class="bitex-view">
         <div class="section-title">
           <h3 class="bitex-view-title">{% t views.settings.title %}</h3>
@@ -466,6 +498,7 @@ load_application:       True
                                                 bitex-view-deposit_requests
                                                 bitex-view-ledger
                                                 bitex-view-settings
+                                                bitex-view-algotrading
                                                 bitex-view-my_broker
                                                 bitex-view-verification">
       <h3><span class="bitex-model bitex-view-title" data-model-key="DisplayName"></span>
@@ -504,6 +537,10 @@ load_application:       True
               <i data-switch-view="offerbook" class="icon-book"></i> {% t views.sidebar.offerbook %}</a>
           </li>
 
+          <li style="">
+            <a href="" data-switch-view="algotrading">
+              <i data-switch-view="algotrading" class="icon-cog"></i> {% t views.sidebar.algotrading %}</a>
+          </li>
 
           <li style="">
             <a href="" data-switch-view="ledger">
